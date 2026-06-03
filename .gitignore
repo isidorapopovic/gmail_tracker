@@ -1,0 +1,4 @@
+# job-tracker/.gitignore
+node_modules/
+.env
+dist/
