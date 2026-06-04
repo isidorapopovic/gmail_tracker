@@ -27,9 +27,9 @@ const JOB_QUERIES = [
     'subject:("hiring") AND (subject:("position") OR subject:("role") OR subject:("opportunity"))',
 ];
 
-export async function fetchJobEmails(accessToken) {
+export async function fetchJobEmails(tokens) {
     const auth = createOAuthClient();
-    auth.setCredentials({ access_token: accessToken });
+    auth.setCredentials(tokens);
     const gmail = google.gmail({ version: "v1", auth });
 
     const threadIds = new Set();

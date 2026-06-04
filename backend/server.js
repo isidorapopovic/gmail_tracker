@@ -76,17 +76,40 @@ app.post("/auth/logout", (req, res) => {
 
 app.post("/sync", async (req, res) => {
     const tokens = getGmailTokens(req);
+
+    console.log("SYNC AUTH:", {
+        hasTokens: !!tokens,
+        hasAccessToken: !!tokens?.access_token,
+        hasRefreshToken: !!tokens?.refresh_token,
+    });
+
     if (!tokens) return res.status(401).json({ error: "Not authenticated" });
+
     try {
-        const threads = await fetchJobEmails(tokens.access_token);
-        let added = 0, updated = 0;
+        const threads = await fetchJobEmails(tokens);
+
+        console.log("SYNC RESULT:", {
+            threadsFound: threads.length,
+        });
+
+        let added = 0;
+        let updated = 0;
+
         for (const thread of threads) {
             const classified = classifyEmail(thread);
             const result = await upsertJob(classified);
-            if (result?.inserted) added++; else updated++;
+            if (result?.inserted) added++;
+            else updated++;
         }
+
         await logSync(threads.length, added, updated);
-        res.json({ ok: true, emailsFound: threads.length, jobsAdded: added, jobsUpdated: updated });
+
+        res.json({
+            ok: true,
+            emailsFound: threads.length,
+            jobsAdded: added,
+            jobsUpdated: updated,
+        });
     } catch (err) {
         console.error("Sync error:", err);
         res.status(500).json({ error: err.message });

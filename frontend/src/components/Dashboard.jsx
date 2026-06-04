@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { getJobs, getStats, syncEmails, logout } from "../api";
 import StatsBar from "./StatsBar";
 import JobTable from "./JobTable";
@@ -11,8 +11,13 @@ export default function Dashboard({ onLogout }) {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("all");
     const [search, setSearch] = useState("");
+    const loadingRef = useRef(false);
 
     const loadData = useCallback(async () => {
+        if (loadingRef.current) return;
+
+        loadingRef.current = true;
+
         try {
             setLoading(true);
 
@@ -24,29 +29,18 @@ export default function Dashboard({ onLogout }) {
             setJobs(jobsRes.data);
             setStats(statsRes.data);
         } catch (err) {
-            console.error("Failed to load dashboard data:", err);
+            console.error("Failed to load jobs/stats:", err);
             setSyncResult({
-                error: err.response?.data?.error || "Could not load jobs/stats",
+                error: err.response?.data?.error || "Failed to load dashboard data",
             });
         } finally {
+            loadingRef.current = false;
             setLoading(false);
         }
     }, []);
 
     useEffect(() => {
-        let cancelled = false;
-
-        async function run() {
-            if (!cancelled) {
-                await loadData();
-            }
-        }
-
-        run();
-
-        return () => {
-            cancelled = true;
-        };
+        loadData();
     }, [loadData]);
 
     const handleSync = async () => {
