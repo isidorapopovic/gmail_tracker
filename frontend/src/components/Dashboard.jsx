@@ -117,7 +117,7 @@ export default function Dashboard({ onLogout }) {
                 ) : filteredJobs.length === 0 ? (
                     <EmptyState filter={filter} onSync={handleSync} />
                 ) : (
-                    <JobTable jobs={filteredJobs} onRefresh={loadData} />
+                    <JobTable jobs={filteredJobs} onChange={loadData} />
                 )}
             </main>
         </div>
