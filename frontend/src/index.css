@@ -154,4 +154,19 @@ const styles = {
     color: "var(--text3)",
     fontFamily: "'DM Mono', monospace",
   },
-};
+}
+;
+
+
+@keyframes spin {
+    to
+
+{
+    transform: rotate(360deg);
+}
+
+}
+
+button {
+    color: inherit;
+}
