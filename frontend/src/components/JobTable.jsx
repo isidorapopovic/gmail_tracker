@@ -157,7 +157,7 @@ function EmptyState({ filter, onSync }) {
       </p>
       <p style={s.emptyDesc}>
         {filter === "all"
-          ? "Click "Sync Gmail" to scan your inbox for job-related emails."
+          ? 'Click "Sync Gmail" to scan your inbox for job-related emails.'
           : "Try switching to a different status filter."}
       </p>
       {filter === "all" && (
