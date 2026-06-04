@@ -1,17 +1,9 @@
 import { useState, useEffect } from "react";
 import { checkAuth, loginWithGoogle, logout } from "./api";
 import Dashboard from "./components/Dashboard";
-import styled, { keyframes } from "./styled";
-
-const fadeIn = `
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-`;
 
 export default function App() {
-    const [auth, setAuth] = useState(null); // null = loading
+    const [auth, setAuth] = useState(null);
 
     useEffect(() => {
         checkAuth()
@@ -31,46 +23,32 @@ export default function App() {
 
 function LoadingScreen() {
     return (
-        <div style={styles.center}>
-            <div style={styles.spinner} />
+        <div style={s.center}>
+            <div style={s.spinner} />
         </div>
     );
 }
 
 function LoginScreen() {
     return (
-        <>
-            <style>{`
-        ${fadeIn}
-        .login-card { animation: fadeIn 0.5s ease forwards; }
-        .login-btn:hover { background: #3a7de6 !important; transform: translateY(-1px); }
-        .login-btn:active { transform: translateY(0); }
-      `}</style>
-            <div style={styles.center}>
-                <div className="login-card" style={styles.card}>
-                    <div style={styles.logoRow}>
-                        <span style={styles.logoIcon}>◈</span>
-                        <span style={styles.logoText}>JobTracker</span>
-                    </div>
-                    <h1 style={styles.title}>Track every application,<br />miss no opportunity.</h1>
-                    <p style={styles.subtitle}>
-                        Connects to your Gmail to automatically detect job applications,
-                        interviews, offers, and rejections — all in one place.
-                    </p>
-                    <button
-                        className="login-btn"
-                        style={styles.loginBtn}
-                        onClick={loginWithGoogle}
-                    >
-                        <GoogleIcon />
-                        Continue with Google
-                    </button>
-                    <p style={styles.disclaimer}>
-                        Read-only Gmail access. Your emails never leave your server.
-                    </p>
+        <div style={s.center}>
+            <div style={s.card}>
+                <div style={s.logoRow}>
+                    <span style={s.logoIcon}>◈</span>
+                    <span style={s.logoText}>JobTracker</span>
                 </div>
+                <h1 style={s.title}>Track every application,<br />miss no opportunity.</h1>
+                <p style={s.subtitle}>
+                    Connects to your Gmail to automatically detect job applications,
+                    interviews, offers, and rejections — all in one place.
+                </p>
+                <button style={s.loginBtn} onClick={loginWithGoogle}>
+                    <GoogleIcon />
+                    Continue with Google
+                </button>
+                <p style={s.disclaimer}>Read-only Gmail access. Your emails never leave your server.</p>
             </div>
-        </>
+        </div>
     );
 }
 
@@ -85,73 +63,15 @@ function GoogleIcon() {
     );
 }
 
-const styles = {
-    center: {
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "var(--bg)",
-    },
-    spinner: {
-        width: 32,
-        height: 32,
-        border: "2px solid var(--border2)",
-        borderTopColor: "var(--accent)",
-        borderRadius: "50%",
-        animation: "spin 0.8s linear infinite",
-    },
-    card: {
-        background: "var(--surface)",
-        border: "1px solid var(--border)",
-        borderRadius: 16,
-        padding: "48px 40px",
-        maxWidth: 440,
-        width: "90vw",
-        textAlign: "center",
-    },
-    logoRow: {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 8,
-        marginBottom: 32,
-    },
+const s = {
+    center: { minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)" },
+    spinner: { width: 32, height: 32, border: "2px solid var(--border2)", borderTopColor: "var(--accent)", borderRadius: "50%", animation: "spin 0.8s linear infinite" },
+    card: { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "48px 40px", maxWidth: 440, width: "90vw", textAlign: "center" },
+    logoRow: { display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 32 },
     logoIcon: { fontSize: 22, color: "var(--accent)" },
     logoText: { fontSize: 16, fontWeight: 700, letterSpacing: "0.05em", color: "var(--text2)" },
-    title: {
-        fontSize: 26,
-        fontWeight: 800,
-        lineHeight: 1.25,
-        marginBottom: 16,
-        color: "var(--text)",
-    },
-    subtitle: {
-        fontSize: 14,
-        color: "var(--text2)",
-        lineHeight: 1.6,
-        marginBottom: 32,
-    },
-    loginBtn: {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "100%",
-        padding: "13px 20px",
-        background: "var(--accent)",
-        color: "#fff",
-        border: "none",
-        borderRadius: 8,
-        fontSize: 15,
-        fontWeight: 600,
-        fontFamily: "Syne, sans-serif",
-        cursor: "pointer",
-        transition: "all 0.15s ease",
-        marginBottom: 14,
-    },
-    disclaimer: {
-        fontSize: 11,
-        color: "var(--text3)",
-        fontFamily: "'DM Mono', monospace",
-    },
+    title: { fontSize: 26, fontWeight: 800, lineHeight: 1.25, marginBottom: 16, color: "var(--text)" },
+    subtitle: { fontSize: 14, color: "var(--text2)", lineHeight: 1.6, marginBottom: 32 },
+    loginBtn: { display: "flex", alignItems: "center", justifyContent: "center", width: "100%", padding: "13px 20px", background: "var(--accent)", color: "#fff", border: "none", borderRadius: 8, fontSize: 15, fontWeight: 600, fontFamily: "Syne, sans-serif", cursor: "pointer", marginBottom: 14 },
+    disclaimer: { fontSize: 11, color: "var(--text3)", fontFamily: "'DM Mono', monospace" },
 };
