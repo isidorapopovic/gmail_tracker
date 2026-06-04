@@ -14,17 +14,40 @@ export default function Dashboard({ onLogout }) {
 
     const loadData = useCallback(async () => {
         try {
-            const [jobsRes, statsRes] = await Promise.all([getJobs(), getStats()]);
+            setLoading(true);
+
+            const [jobsRes, statsRes] = await Promise.all([
+                getJobs(),
+                getStats(),
+            ]);
+
             setJobs(jobsRes.data);
             setStats(statsRes.data);
         } catch (err) {
-            console.error(err);
+            console.error("Failed to load dashboard data:", err);
+            setSyncResult({
+                error: err.response?.data?.error || "Could not load jobs/stats",
+            });
         } finally {
             setLoading(false);
         }
     }, []);
 
-    useEffect(() => { loadData(); }, []);
+    useEffect(() => {
+        let cancelled = false;
+
+        async function run() {
+            if (!cancelled) {
+                await loadData();
+            }
+        }
+
+        run();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [loadData]);
 
     const handleSync = async () => {
         setSyncing(true);
