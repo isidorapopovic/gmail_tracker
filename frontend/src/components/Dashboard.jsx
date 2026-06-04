@@ -24,7 +24,7 @@ export default function Dashboard({ onLogout }) {
         }
     }, []);
 
-    useEffect(() => { loadData(); }, [loadData]);
+    useEffect(() => { loadData(); }, []);
 
     const handleSync = async () => {
         setSyncing(true);
