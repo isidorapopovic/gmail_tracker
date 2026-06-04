@@ -1,12 +1,14 @@
 import axios from "axios";
 
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+
 const api = axios.create({
-    baseURL: "/api",
+    baseURL: BASE_URL,
     withCredentials: true,
 });
 
 export const checkAuth = () => api.get("/auth/status");
-export const loginWithGoogle = () => { window.location.href = "/api/auth/google"; };
+export const loginWithGoogle = () => { window.location.href = `${BASE_URL}/auth/google`; };
 export const logout = () => api.post("/auth/logout");
 
 export const syncEmails = () => api.post("/sync");
