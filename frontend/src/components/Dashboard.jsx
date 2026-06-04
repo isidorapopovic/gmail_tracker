@@ -107,14 +107,21 @@ export default function Dashboard({ onLogout }) {
     );
 }
 
-const STATUS_LABEL = { all: "All", applied: "📨 Applied", reviewing: "👀 Reviewing", interview: "📅 Interview", offer: "✅ Offer", rejected: "❌ Rejected" };
+const STATUS_LABEL = {
+    all: "All",
+    applied: "📨 Applied",
+    reviewing: "👀 Reviewing",
+    interview: "📅 Interview",
+    offer: "✅ Offer",
+    rejected: "❌ Rejected",
+};
 
 function EmptyState({ filter, onSync }) {
     return (
         <div style={s.empty}>
             <div style={s.emptyIcon}>◎</div>
             <p style={s.emptyTitle}>{filter === "all" ? "No applications yet" : `No ${filter} applications`}</p>
-            <p style={s.emptyDesc}>{filter === "all" ? 'Click "Sync Gmail" to scan your inbox.' : "Try switching to a different status filter."}</p>
+            <p style={s.emptyDesc}>{filter === "all" ? 'Click "Sync Gmail" to scan your inbox.' : "Try a different filter."}</p>
             {filter === "all" && <button style={s.btn} onClick={onSync}>↻ Sync Gmail</button>}
         </div>
     );
@@ -122,7 +129,16 @@ function EmptyState({ filter, onSync }) {
 
 function Spinner({ large }) {
     return (
-        <span style={{ display: "inline-block", width: large ? 28 : 14, height: large ? 28 : 14, border: `${large ? 2 : 1.5}px solid var(--border2)`, borderTopColor: "var(--accent)", borderRadius: "50%", animation: "spin 0.7s linear infinite", marginRight: large ? 0 : 6 }} />
+        <span style={{
+            display: "inline-block",
+            width: large ? 28 : 14,
+            height: large ? 28 : 14,
+            border: `${large ? 2 : 1.5}px solid var(--border2)`,
+            borderTopColor: "var(--accent)",
+            borderRadius: "50%",
+            animation: "spin 0.7s linear infinite",
+            marginRight: large ? 0 : 6,
+        }} />
     );
 }
 
@@ -142,4 +158,13 @@ const s = {
     bannerError: { background: "rgba(247,81,79,0.1)", color: "#f7514f", borderBottom: "1px solid rgba(247,81,79,0.2)" },
     toolbar: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 20, flexWrap: "wrap" },
     filterGroup: { display: "flex", gap: 6, flexWrap: "wrap" },
-    filterBtn: { display: "inline-flex", alignItems: "center", gap: 6, padding:
+    filterBtn: { display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", background: "transparent", color: "var(--text2)", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12, fontWeight: 600, fontFamily: "Syne, sans-serif", cursor: "pointer" },
+    filterActive: { background: "var(--accent-dim)", borderColor: "var(--accent)", color: "var(--accent)" },
+    filterCount: { background: "var(--surface2)", borderRadius: 4, padding: "1px 5px", fontSize: 11, fontFamily: "'DM Mono', monospace" },
+    search: { padding: "8px 14px", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text)", fontSize: 13, outline: "none", width: 240 },
+    center: { display: "flex", justifyContent: "center", paddingTop: 80 },
+    empty: { textAlign: "center", padding: "80px 20px", color: "var(--text2)" },
+    emptyIcon: { fontSize: 40, marginBottom: 16, color: "var(--border2)" },
+    emptyTitle: { fontSize: 18, fontWeight: 700, marginBottom: 8, color: "var(--text)" },
+    emptyDesc: { fontSize: 13, color: "var(--text2)", marginBottom: 24, lineHeight: 1.6 },
+};
