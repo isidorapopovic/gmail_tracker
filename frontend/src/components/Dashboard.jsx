@@ -143,28 +143,187 @@ function Spinner({ large }) {
 }
 
 const s = {
-    root: { minHeight: "100vh", background: "var(--bg)" },
-    header: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px", height: 60, borderBottom: "1px solid var(--border)", background: "var(--surface)", position: "sticky", top: 0, zIndex: 10 },
-    headerLeft: { display: "flex", alignItems: "center", gap: 10 },
-    logo: { fontSize: 20, color: "var(--accent)" },
-    logoLabel: { fontWeight: 700, fontSize: 16, letterSpacing: "0.04em" },
-    headerRight: { display: "flex", gap: 10 },
-    main: { padding: "28px 32px", maxWidth: 1300, margin: "0 auto" },
-    btn: { display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 16px", background: "var(--accent)", color: "#fff", border: "none", borderRadius: 7, fontSize: 13, fontWeight: 600, fontFamily: "Syne, sans-serif", cursor: "pointer" },
-    btnGhost: { background: "transparent", color: "var(--text2)", border: "1px solid var(--border2)" },
-    btnDisabled: { opacity: 0.6, cursor: "not-allowed" },
-    banner: { padding: "10px 32px", fontSize: 13, fontFamily: "'DM Mono', monospace" },
-    bannerSuccess: { background: "rgba(79,207,142,0.1)", color: "#4fcf8e", borderBottom: "1px solid rgba(79,207,142,0.2)" },
-    bannerError: { background: "rgba(247,81,79,0.1)", color: "#f7514f", borderBottom: "1px solid rgba(247,81,79,0.2)" },
-    toolbar: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 20, flexWrap: "wrap" },
-    filterGroup: { display: "flex", gap: 6, flexWrap: "wrap" },
-    filterBtn: { display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", background: "transparent", color: "var(--text2)", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12, fontWeight: 600, fontFamily: "Syne, sans-serif", cursor: "pointer" },
-    filterActive: { background: "var(--accent-dim)", borderColor: "var(--accent)", color: "var(--accent)" },
-    filterCount: { background: "var(--surface2)", borderRadius: 4, padding: "1px 5px", fontSize: 11, fontFamily: "'DM Mono', monospace" },
-    search: { padding: "8px 14px", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 7, color: "var(--text)", fontSize: 13, outline: "none", width: 240 },
-    center: { display: "flex", justifyContent: "center", paddingTop: 80 },
-    empty: { textAlign: "center", padding: "80px 20px", color: "var(--text2)" },
-    emptyIcon: { fontSize: 40, marginBottom: 16, color: "var(--border2)" },
-    emptyTitle: { fontSize: 18, fontWeight: 700, marginBottom: 8, color: "var(--text)" },
-    emptyDesc: { fontSize: 13, color: "var(--text2)", marginBottom: 24, lineHeight: 1.6 },
+    root: {
+        minHeight: "100vh",
+        background: "var(--bg)",
+        color: "var(--text)",
+        fontFamily: 'Georgia, "Times New Roman", Times, serif',
+    },
+
+    header: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "24px 48px 8px",
+        height: "auto",
+        borderBottom: "none",
+        background: "var(--surface)",
+        position: "static",
+        zIndex: 10,
+    },
+
+    headerLeft: {
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+    },
+
+    logo: {
+        fontSize: 17,
+        color: "var(--text)",
+        lineHeight: 1,
+    },
+
+    logoLabel: {
+        fontWeight: 700,
+        fontSize: 16,
+        letterSpacing: "0.02em",
+    },
+
+    headerRight: {
+        display: "flex",
+        gap: 10,
+        alignItems: "center",
+    },
+
+    main: {
+        padding: "8px 88px 48px",
+        maxWidth: "none",
+        margin: "0",
+    },
+
+    btn: {
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        padding: "0",
+        background: "transparent",
+        color: "var(--text)",
+        border: "none",
+        borderRadius: 0,
+        fontSize: 13,
+        fontWeight: 700,
+        fontFamily: 'Georgia, "Times New Roman", Times, serif',
+        cursor: "pointer",
+    },
+
+    btnGhost: {
+        background: "transparent",
+        color: "var(--text)",
+        border: "none",
+    },
+
+    btnDisabled: {
+        opacity: 0.45,
+        cursor: "not-allowed",
+    },
+
+    banner: {
+        padding: "10px 88px",
+        fontSize: 13,
+        fontFamily: 'Georgia, "Times New Roman", Times, serif',
+    },
+
+    bannerSuccess: {
+        background: "transparent",
+        color: "var(--text)",
+        borderBottom: "none",
+    },
+
+    bannerError: {
+        background: "transparent",
+        color: "var(--text)",
+        borderBottom: "none",
+    },
+
+    toolbar: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 24,
+        marginTop: 28,
+        marginBottom: 72,
+        flexWrap: "wrap",
+    },
+
+    filterGroup: {
+        display: "flex",
+        gap: 26,
+        flexWrap: "wrap",
+        alignItems: "center",
+    },
+
+    filterBtn: {
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 7,
+        padding: 0,
+        background: "transparent",
+        color: "var(--text)",
+        border: "none",
+        borderRadius: 0,
+        fontSize: 14,
+        fontWeight: 700,
+        fontFamily: 'Georgia, "Times New Roman", Times, serif',
+        cursor: "pointer",
+    },
+
+    filterActive: {
+        background: "transparent",
+        borderColor: "transparent",
+        color: "var(--text)",
+    },
+
+    filterCount: {
+        background: "transparent",
+        borderRadius: 0,
+        padding: 0,
+        fontSize: 12,
+        fontWeight: 700,
+        fontFamily: 'Georgia, "Times New Roman", Times, serif',
+    },
+
+    search: {
+        padding: "4px 0",
+        background: "transparent",
+        border: "none",
+        borderRadius: 0,
+        color: "var(--text)",
+        fontSize: 14,
+        outline: "none",
+        width: 260,
+    },
+
+    center: {
+        display: "flex",
+        justifyContent: "center",
+        paddingTop: 80,
+    },
+
+    empty: {
+        textAlign: "center",
+        padding: "10px 20px 80px",
+        color: "var(--text)",
+    },
+
+    emptyIcon: {
+        fontSize: 42,
+        marginBottom: 22,
+        color: "var(--text)",
+        lineHeight: 1,
+    },
+
+    emptyTitle: {
+        fontSize: 20,
+        fontWeight: 700,
+        marginBottom: 16,
+        color: "var(--text)",
+    },
+
+    emptyDesc: {
+        fontSize: 14,
+        color: "var(--text)",
+        marginBottom: 24,
+        lineHeight: 1.6,
+    },
 };

@@ -5,22 +5,22 @@
 }
 
 :root {
-    --bg: #f5f7fa;
+    --bg: #ffffff;
     --surface: #ffffff;
-    --surface2: #f0f2f5;
-    --border: #e1e4e8;
-    --border2: #d0d4da;
-    --text: #1a1e28;
-    --text2: #555e72;
-    --text3: #9aa0ad;
-    --accent: #4f8ef7;
-    --accent-dim: rgba(79,142,247,0.1);
-    --applied: #4f8ef7;
-    --reviewing: #9b6bff;
-    --interview: #f7a84f;
-    --offer: #2da868;
-    --rejected: #e53e3e;
-    --unknown: #9aa0ad;
+    --surface2: #ffffff;
+    --border: transparent;
+    --border2: #111111;
+    --text: #050505;
+    --text2: #111111;
+    --text3: #444444;
+    --accent: #000000;
+    --accent-dim: transparent;
+    --applied: #111111;
+    --reviewing: #111111;
+    --interview: #111111;
+    --offer: #111111;
+    --rejected: #111111;
+    --unknown: #111111;
 }
 
 html {
@@ -30,37 +30,35 @@ html {
 body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Syne', sans-serif;
+    font-family: Georgia, "Times New Roman", Times, serif;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--surface2);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--border2);
-    border-radius: 3px;
+button,
+input,
+textarea,
+select {
+    font-family: inherit;
 }
 
 button {
-    font-family: inherit;
     cursor: pointer;
     color: inherit;
 }
 
-input, textarea, select {
-    font-family: 'DM Mono', monospace;
+input {
+    border: none;
+    outline: none;
 }
 
 .mono {
-    font-family: 'DM Mono', monospace;
+    font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+::selection {
+    background: #111;
+    color: #fff;
 }
 
 @keyframes spin {

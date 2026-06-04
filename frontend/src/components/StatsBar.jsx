@@ -109,87 +109,99 @@ function StatCard({ label, value, accent, sub }) {
 }
 
 const s = {
-  wrapper: { marginBottom: 28 },
-  cards: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-    gap: 14,
-    marginBottom: 16,
-  },
-  card: {
-    background: "var(--surface)",
-    border: "1px solid var(--border)",
-    borderRadius: 10,
-    padding: "16px 18px",
-  },
-  cardValue: {
-    fontSize: 32,
-    fontWeight: 800,
-    lineHeight: 1,
-    marginBottom: 6,
-  },
-  cardLabel: {
-    fontSize: 12,
-    fontWeight: 700,
-    color: "var(--text2)",
-    textTransform: "uppercase",
-    letterSpacing: "0.06em",
-    marginBottom: 4,
-  },
-  cardSub: {
-    fontSize: 11,
-    color: "var(--text3)",
-    fontFamily: "'DM Mono', monospace",
-  },
-  breakdown: {
-    background: "var(--surface)",
-    border: "1px solid var(--border)",
-    borderRadius: 10,
-    padding: "16px 18px",
-  },
-  barLabel: {
-    fontSize: 11,
-    fontWeight: 700,
-    color: "var(--text3)",
-    textTransform: "uppercase",
-    letterSpacing: "0.06em",
-    marginBottom: 10,
-  },
-  bar: {
-    display: "flex",
-    height: 8,
-    borderRadius: 4,
-    overflow: "hidden",
-    background: "var(--surface2)",
-    marginBottom: 12,
-    gap: 2,
-  },
-  barSegment: {
-    height: "100%",
-    transition: "width 0.4s ease",
-    borderRadius: 2,
-  },
-  legend: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "8px 20px",
-  },
-  legendItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    fontSize: 12,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    display: "inline-block",
-  },
-  legendLabel: { color: "var(--text2)" },
-  legendCount: {
-    color: "var(--text3)",
-    fontFamily: "'DM Mono', monospace",
-    fontSize: 11,
-  },
+    wrapper: {
+        marginTop: 8,
+        marginBottom: 30,
+    },
+
+    cards: {
+        display: "grid",
+        gridTemplateColumns: "repeat(4, minmax(140px, 1fr))",
+        gap: 80,
+        marginBottom: 46,
+        maxWidth: 1050,
+    },
+
+    card: {
+        background: "transparent",
+        border: "none",
+        borderRadius: 0,
+        padding: 0,
+    },
+
+    cardValue: {
+        fontSize: 34,
+        fontWeight: 700,
+        lineHeight: 1,
+        marginBottom: 9,
+        color: "var(--text)",
+    },
+
+    cardLabel: {
+        fontSize: 13,
+        fontWeight: 700,
+        color: "var(--text)",
+        textTransform: "uppercase",
+        letterSpacing: "0.07em",
+        marginBottom: 5,
+    },
+
+    cardSub: {
+        fontSize: 13,
+        color: "var(--text)",
+        fontFamily: 'Georgia, "Times New Roman", Times, serif',
+    },
+
+    breakdown: {
+        background: "transparent",
+        border: "none",
+        borderRadius: 0,
+        padding: 0,
+    },
+
+    barLabel: {
+        fontSize: 13,
+        fontWeight: 700,
+        color: "var(--text)",
+        textTransform: "uppercase",
+        letterSpacing: "0.07em",
+        marginBottom: 28,
+    },
+
+    bar: {
+        display: "none",
+    },
+
+    barSegment: {
+        height: "100%",
+    },
+
+    legend: {
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "0 42px",
+    },
+
+    legendItem: {
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        fontSize: 14,
+        color: "var(--text)",
+    },
+
+    dot: {
+        display: "none",
+    },
+
+    legendLabel: {
+        color: "var(--text)",
+    },
+
+    legendCount: {
+        color: "var(--text)",
+        fontFamily: 'Georgia, "Times New Roman", Times, serif',
+        fontSize: 13,
+        fontWeight: 700,
+    },
 };
