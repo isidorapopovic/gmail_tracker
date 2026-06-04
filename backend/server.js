@@ -34,8 +34,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, // set true in production with HTTPS
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        secure: true,
+        sameSite: "none",        // set true in production with HTTPS
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     },
   })
 );
