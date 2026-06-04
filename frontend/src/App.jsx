@@ -6,6 +6,14 @@ export default function App() {
     const [auth, setAuth] = useState(null);
 
     useEffect(() => {
+        // Grab token from URL if coming back from Google OAuth
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("token");
+        if (token) {
+            localStorage.setItem("app_token", token);
+            window.history.replaceState({}, "", "/"); // clean URL
+        }
+
         checkAuth()
             .then((r) => setAuth(r.data.authenticated))
             .catch(() => setAuth(false));
@@ -23,9 +31,7 @@ export default function App() {
 
 function LoadingScreen() {
     return (
-        <div style={s.center}>
-            <div style={s.spinner} />
-        </div>
+        <div style={s.center}><div style={s.spinner} /></div>
     );
 }
 
@@ -38,10 +44,7 @@ function LoginScreen() {
                     <span style={s.logoText}>JobTracker</span>
                 </div>
                 <h1 style={s.title}>Track every application,<br />miss no opportunity.</h1>
-                <p style={s.subtitle}>
-                    Connects to your Gmail to automatically detect job applications,
-                    interviews, offers, and rejections — all in one place.
-                </p>
+                <p style={s.subtitle}>Connects to your Gmail to automatically detect job applications, interviews, offers, and rejections — all in one place.</p>
                 <button style={s.loginBtn} onClick={loginWithGoogle}>
                     <GoogleIcon />
                     Continue with Google
