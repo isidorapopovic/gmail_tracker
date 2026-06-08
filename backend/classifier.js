@@ -1,264 +1,250 @@
-// Classify a Gmail thread into a job application entry
+// ─── Normalise ───────────────────────────────────────────────────────────────
 
-const STATUS_RULES = {
-    offer: [
-        [/offer letter/i, 6],
-        [/offer of employment/i, 6],
-        [/pleased to offer/i, 6],
-        [/we('d| would) like to offer/i, 5],
-        [/extend.*offer/i, 5],
-        [/job offer/i, 5],
-        [/congratulations.*offer/i, 5],
-        [/congratulations/i, 2],
-    ],
-
-    rejected: [
-        [/not moving forward/i, 6],
-        [/will not be moving/i, 6],
-        [/not selected/i, 6],
-        [/decided not to/i, 5],
-        [/not be proceeding/i, 5],
-        [/not a match/i, 5],
-        [/filled the position/i, 5],
-        [/gone with another/i, 5],
-        [/other candidates/i, 4],
-        [/regret to inform/i, 4],
-        [/we appreciate.*not/i, 3],
-        [/unfortunately/i, 1],
-    ],
-
-    interview: [
-        [/interview/i, 5],
-        [/schedule (a|an)?\s*(call|interview|chat)/i, 6],
-        [/speak with you/i, 4],
-        [/chat with you/i, 4],
-        [/meet with you/i, 4],
-        [/next step/i, 4],
-        [/technical assessment/i, 5],
-        [/coding challenge/i, 5],
-        [/take-home/i, 4],
-        [/video call/i, 4],
-        [/phone screen/i, 5],
-    ],
-
-    reviewing: [
-        [/under review/i, 5],
-        [/being reviewed/i, 5],
-        [/carefully review/i, 4],
-        [/in review/i, 4],
-        [/considering your/i, 4],
-        [/shortlisted/i, 5],
-    ],
-
-    applied: [
-        [/application received/i, 5],
-        [/thank you for applying/i, 5],
-        [/thanks for applying/i, 5],
-        [/application submitted/i, 5],
-        [/we received your/i, 4],
-        [/application has been received/i, 5],
-        [/successfully applied/i, 5],
-    ],
-};
-
-function normaliseText(value = "") {
-    return value
+function normalise(text = "") {
+    return text
         .replace(/\s+/g, " ")
-        .replace(/[“”]/g, '"')
-        .replace(/[‘’]/g, "'")
+        .replace(/[""]/g, '"')
+        .replace(/['']/g, "'")
+        .toLowerCase()
         .trim();
 }
 
+// ─── Status Classification ───────────────────────────────────────────────────
+
+const RULES = {
+    offer: [
+        [/offer letter/i, 8],
+        [/offer of employment/i, 8],
+        [/pleased to (offer|extend an offer)/i, 8],
+        [/we('d| would) like to offer you/i, 8],
+        [/formal offer/i, 7],
+        [/job offer/i, 6],
+        [/extend.*offer/i, 6],
+        [/congratulations.*offer/i, 6],
+        [/accept.*offer/i, 5],
+        [/start date/i, 3],
+        [/compensation package/i, 4],
+        [/salary.*offer/i, 5],
+    ],
+    rejected: [
+        [/will not be moving forward/i, 9],
+        [/not moving forward with your/i, 9],
+        [/decided (not to|to not) move/i, 8],
+        [/not selected for/i, 8],
+        [/not be proceeding/i, 8],
+        [/filled the position/i, 7],
+        [/gone with another candidate/i, 7],
+        [/pursued other candidates/i, 7],
+        [/not a (good )?match/i, 7],
+        [/regret to (inform|let you know)/i, 6],
+        [/position has been filled/i, 7],
+        [/no longer (moving|considering)/i, 7],
+        [/after careful consideration/i, 4],
+        [/we appreciate your interest.*however/i, 5],
+        [/other candidates (more closely|better)/i, 6],
+        [/unfortunately.*not/i, 4],
+        [/unfortunately/i, 2],
+    ],
+    interview: [
+        [/schedule.{0,30}(interview|call|meeting|chat)/i, 8],
+        [/invite you.{0,30}(interview|call)/i, 8],
+        [/like to (speak|talk|chat) with you/i, 7],
+        [/next (round|stage|step).{0,30}(interview|call)/i, 7],
+        [/phone (screen|interview)/i, 7],
+        [/video (interview|call)/i, 7],
+        [/technical (interview|assessment|screen)/i, 7],
+        [/coding (challenge|assessment|test)/i, 7],
+        [/take.?home (assignment|test|project)/i, 7],
+        [/on.?site interview/i, 7],
+        [/moved (forward|to the next)/i, 6],
+        [/shortlisted for/i, 6],
+        [/would like to (meet|connect)/i, 5],
+        [/availability.{0,40}(call|chat|meeting)/i, 5],
+        [/calendly/i, 5],
+        [/book.{0,20}(time|slot|call)/i, 4],
+        [/interview/i, 3],
+    ],
+    reviewing: [
+        [/application is (under|being) review/i, 7],
+        [/currently reviewing/i, 7],
+        [/shortlisted/i, 6],
+        [/under consideration/i, 6],
+        [/carefully (reviewing|considering)/i, 6],
+        [/your application.*progressed/i, 6],
+        [/moved to the (next|review)/i, 5],
+        [/in our (review|selection) process/i, 5],
+        [/keep your (application|cv|resume) on file/i, 4],
+    ],
+    applied: [
+        [/application (has been |successfully )?(received|submitted|confirmed)/i, 7],
+        [/thank you for (applying|your application)/i, 7],
+        [/thanks for (applying|your interest)/i, 7],
+        [/successfully (applied|submitted)/i, 7],
+        [/we('ve| have) received your application/i, 7],
+        [/your application.*has been (received|submitted)/i, 7],
+        [/application confirmation/i, 6],
+        [/we'll (review|be in touch)/i, 4],
+    ],
+};
+
+// Phrases that cancel out false positives
+const CANCELLERS = [
+    { pattern: /unfortunately.{0,80}(reschedule|delay|postpone)/i, penalise: "rejected", boost: "interview", amount: 4 },
+    { pattern: /cannot (offer|provide)/i, penalise: "offer", boost: "rejected", amount: 5 },
+    { pattern: /unable to offer/i, penalise: "offer", boost: "rejected", amount: 5 },
+    { pattern: /not able to offer/i, penalise: "offer", boost: "rejected", amount: 5 },
+    { pattern: /thank you.*application.*unfortunately/i, penalise: null, boost: "rejected", amount: 3 },
+    { pattern: /keep.*on file/i, penalise: "rejected", boost: "reviewing", amount: 4 },
+];
+
 function classifyStatus(subject = "", snippet = "", body = "") {
-    const text = normaliseText(`${subject}\n${snippet}\n${body}`);
-    const scores = {};
-    const reasons = {};
+    const text = normalise(`${subject} ${snippet} ${body}`);
+    const scores = { offer: 0, rejected: 0, interview: 0, reviewing: 0, applied: 0 };
 
-    for (const status of Object.keys(STATUS_RULES)) {
-        scores[status] = 0;
-        reasons[status] = [];
-    }
-
-    for (const [status, rules] of Object.entries(STATUS_RULES)) {
+    // Score each status
+    for (const [status, rules] of Object.entries(RULES)) {
         for (const [regex, weight] of rules) {
-            const match = text.match(regex);
-            if (match) {
-                scores[status] += weight;
-                reasons[status].push(match[0]);
-            }
+            if (regex.test(text)) scores[status] += weight;
         }
     }
 
-    // Avoid false rejection for emails like:
-    // "Unfortunately we need to reschedule your interview"
-    if (/unfortunately.{0,80}(reschedule|delay|postpone|move)/i.test(text)) {
-        scores.rejected -= 3;
-        scores.interview += 2;
+    // Apply cancellers
+    for (const { pattern, penalise, boost, amount } of CANCELLERS) {
+        if (pattern.test(text)) {
+            if (penalise) scores[penalise] = Math.max(0, scores[penalise] - amount);
+            if (boost) scores[boost] += amount;
+        }
     }
 
-    // Avoid "offer" false positives from phrases like:
-    // "we cannot offer you a position"
-    if (/cannot offer|unable to offer|not able to offer/i.test(text)) {
-        scores.offer -= 5;
-        scores.rejected += 3;
-    }
+    const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+    const [bestStatus, bestScore] = sorted[0];
 
-    const [bestStatus, bestScore] = Object.entries(scores).sort(
-        (a, b) => b[1] - a[1]
-    )[0];
-
-    if (bestScore < 3) {
-        return {
-            status: "unknown",
-            confidence: 0,
-            reason: "No strong status pattern matched",
-        };
-    }
+    if (bestScore < 4) return { status: "unknown", confidence: 0 };
 
     return {
         status: bestStatus,
-        confidence: Math.min(bestScore, 10),
-        reason: reasons[bestStatus].slice(0, 3).join(", "),
+        confidence: Math.min(Math.round(bestScore / 2), 10),
     };
 }
 
-function cleanCompany(value = "") {
-    const cleaned = value
+// ─── Company Extraction ───────────────────────────────────────────────────────
+
+const GENERIC_DOMAINS = new Set([
+    "gmail", "yahoo", "outlook", "hotmail", "mail", "icloud", "proton",
+    "lever", "greenhouse", "workday", "ashbyhq", "jobvite", "icims",
+    "smartrecruiters", "myworkdayjobs", "workdayjobs", "taleo", "jobvite",
+    "notifications", "email", "noreply", "no-reply", "careers", "jobs",
+    "recruiting", "talent", "hire", "apply", "workable", "breezy", "jazz",
+]);
+
+const GENERIC_NAMES = new Set([
+    "team", "recruiting", "talent", "careers", "hr", "jobs", "no-reply",
+    "noreply", "notifications", "hello", "info", "support", "hiring",
+]);
+
+function titleCase(str) {
+    return str
+        .replace(/[-_]+/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase())
+        .trim();
+}
+
+function cleanCompanyName(raw = "") {
+    const cleaned = raw
         .replace(/\s*(team|recruiting|talent|careers|hr|jobs|no.?reply)\s*/gi, " ")
         .replace(/[<>"']/g, "")
         .replace(/\s+/g, " ")
         .replace(/[.,\-–:]+$/g, "")
         .trim();
 
-    if (!cleaned) return null;
-
-    if (
-        /^(team|recruiting|talent|careers|hr|jobs|no.?reply|notifications|hello)$/i.test(
-            cleaned
-        )
-    ) {
-        return null;
-    }
-
+    if (!cleaned || cleaned.length < 2) return null;
+    if (GENERIC_NAMES.has(cleaned.toLowerCase())) return null;
     return cleaned;
 }
 
-function humaniseCompany(value = "") {
-    return cleanCompany(
-        value
-            .replace(/[-_]+/g, " ")
-            .replace(/\b\w/g, (char) => char.toUpperCase())
-    );
-}
-
 function extractCompany(from = "", subject = "", body = "", replyTo = "") {
-    const text = `${from}\n${replyTo}\n${subject}\n${body}`;
+    const allText = `${from} ${replyTo} ${subject} ${body}`;
 
-    // ATS-specific URL/subdomain patterns
+    // 1. ATS subdomain patterns (most reliable)
     const atsPatterns = [
-        /jobs\.lever\.co\/([^/\s?#]+)/i,
-        /boards\.greenhouse\.io\/([^/\s?#]+)/i,
-        /job-boards\.greenhouse\.io\/([^/\s?#]+)/i,
+        /jobs\.lever\.co\/([a-z0-9-]+)/i,
+        /boards\.greenhouse\.io\/([a-z0-9-]+)/i,
+        /job-boards\.greenhouse\.io\/([a-z0-9-]+)/i,
         /([\w-]+)\.greenhouse\.io/i,
         /([\w-]+)\.lever\.co/i,
         /([\w-]+)\.ashbyhq\.com/i,
         /([\w-]+)\.workdayjobs\.com/i,
         /([\w-]+)\.myworkdayjobs\.com/i,
+        /([\w-]+)\.jobvite\.com/i,
+        /([\w-]+)\.workable\.com/i,
+        /([\w-]+)\.breezy\.hr/i,
     ];
 
     for (const pattern of atsPatterns) {
-        const match = text.match(pattern);
-        if (match?.[1]) {
-            const company = humaniseCompany(match[1]);
-            if (company) return company;
+        const match = allText.match(pattern);
+        if (match?.[1] && !GENERIC_DOMAINS.has(match[1].toLowerCase())) {
+            return titleCase(match[1]);
         }
     }
 
-    // Subject/body examples:
-    // "Your application to Stripe"
-    // "Application for Software Engineer at Monzo"
-    // "Thank you for applying to Wise"
-    const companyPatterns = [
-        /(?:application|applied)\s+(?:to|at)\s+([A-Z][A-Za-z0-9&.\- ]{2,60})(?:\s|$|[-–,:.])/i,
-        /(?:application|applied)\s+for\s+.+?\s+at\s+([A-Z][A-Za-z0-9&.\- ]{2,60})(?:\s|$|[-–,:.])/i,
-        /thank you for applying to\s+([A-Z][A-Za-z0-9&.\- ]{2,60})(?:\s|$|[-–,:.])/i,
-        /(?:position|role)\s+at\s+([A-Z][A-Za-z0-9&.\- ]{2,60})(?:\s|$|[-–,:.])/i,
+    // 2. Subject line patterns
+    const subjectPatterns = [
+        /(?:application|applied)\s+(?:to|at)\s+([A-Z][A-Za-z0-9&.\- ]{2,50})(?=\s*[-–,.]|\s+for|\s*$)/,
+        /thank you for applying to\s+([A-Z][A-Za-z0-9&.\- ]{2,50})(?=\s*[-–,.]|\s*$)/i,
+        /(?:position|role|job)\s+at\s+([A-Z][A-Za-z0-9&.\- ]{2,50})(?=\s*[-–,.]|\s*$)/i,
+        /your\s+([A-Z][A-Za-z0-9&.\- ]{2,50})\s+application/,
+        /from\s+([A-Z][A-Za-z0-9&.\- ]{2,50})\s+(?:recruiting|talent|careers)/i,
     ];
 
-    for (const pattern of companyPatterns) {
-        const match = text.match(pattern);
+    for (const pattern of subjectPatterns) {
+        const match = `${subject} ${body}`.match(pattern);
         if (match?.[1]) {
-            const company = cleanCompany(match[1]);
-            if (company) return company;
+            const name = cleanCompanyName(match[1]);
+            if (name) return name;
         }
     }
 
-    // Try sender domain
+    // 3. Sender email domain
     const emailMatch = from.match(/@([\w.-]+)/);
     if (emailMatch) {
         const host = emailMatch[1].toLowerCase();
         const parts = host.split(".");
-        const domain = parts.length > 2 ? parts[parts.length - 2] : parts[0];
+        // Try second-level domain first (e.g. "stripe" from "jobs.stripe.com")
+        const candidates = parts.length > 2
+            ? [parts[parts.length - 2], parts[0]]
+            : [parts[0]];
 
-        const genericDomains = new Set([
-            "gmail",
-            "yahoo",
-            "outlook",
-            "hotmail",
-            "mail",
-            "icloud",
-            "proton",
-            "lever",
-            "greenhouse",
-            "workday",
-            "ashbyhq",
-            "jobvite",
-            "icims",
-            "smartrecruiters",
-            "myworkdayjobs",
-            "workdayjobs",
-            "taleo",
-            "notifications",
-            "email",
-            "noreply",
-            "no-reply",
-        ]);
-
-        if (!genericDomains.has(domain)) {
-            const company = humaniseCompany(domain);
-            if (company) return company;
+        for (const candidate of candidates) {
+            if (!GENERIC_DOMAINS.has(candidate) && candidate.length > 2) {
+                return titleCase(candidate);
+            }
         }
     }
 
-    // Try display name
-    const nameMatch = from.match(/^"?([^"<@]+)"?\s*</);
+    // 4. Sender display name
+    const nameMatch = from.match(/^"?([^"<@\n]{2,50})"?\s*</);
     if (nameMatch) {
-        const company = cleanCompany(nameMatch[1]);
-        if (company) return company;
+        const name = cleanCompanyName(nameMatch[1]);
+        if (name) return name;
     }
 
     return "Unknown Company";
 }
 
-function cleanRole(value = "") {
-    const role = value
+// ─── Role Extraction ──────────────────────────────────────────────────────────
+
+const BAD_ROLE_WORDS = /^(application|candidate|company|interview|offer|status|update|thank|unfortunately|received|submitted|position|role|job|your|our)$/i;
+
+function cleanRole(raw = "") {
+    const role = raw
         .replace(/\s+/g, " ")
         .replace(/^(the|a|an)\s+/i, "")
         .replace(/[.,\-–:]+$/g, "")
         .trim();
 
     if (!role || role.length < 3 || role.length > 80) return null;
-
-    if (
-        /^(application|candidate|company|interview|offer|status|update)$/i.test(role)
-    ) {
-        return null;
-    }
-
-    if (/thank you|unfortunately|received|submitted/i.test(role)) {
-        return null;
-    }
-
+    if (BAD_ROLE_WORDS.test(role)) return null;
+    if (/thank you|unfortunately|received|submitted/i.test(role)) return null;
     return role;
 }
 
@@ -266,11 +252,16 @@ function extractRole(subject = "", body = "") {
     const text = `${subject}\n${body}`;
 
     const patterns = [
-        /(?:application|applied)\s+(?:for|to)\s+(?:the\s+)?["“]?([^"\n“”]{3,80}?)(?:["”]?\s+(?:role|position|job)?\s*(?:at|with|[-–,.\n]))/i,
-        /(?:position|role|job):\s*([^\n]{3,80})/i,
-        /(?:for the)\s+([A-Za-z0-9\s\/+#.&-]{3,80})\s+(?:position|role)/i,
-        /([A-Za-z0-9\s\/+#.&-]{3,80})\s+(?:position|role)\s+at/i,
-        /re:\s*([A-Za-z0-9\s\/+#.&-]{3,80})\s*[-–]\s*/i,
+        // "application for Software Engineer at Stripe"
+        /application\s+for\s+(?:the\s+)?[""]?([^""\n]{3,80}?)[""]?\s+(?:at|with|role|position)/i,
+        // "Software Engineer - Application Received"
+        /^([A-Za-z0-9\s\/+#.&-]{3,60})\s*[-–|]\s*(?:application|your application)/i,
+        // "Your application to Stripe for Software Engineer"
+        /\bfor\s+(?:the\s+)?([A-Za-z0-9\s\/+#.&()-]{3,60})\s+(?:role|position|job)\b/i,
+        // "Re: Software Engineer"
+        /^re:\s*([A-Za-z0-9\s\/+#.&()-]{3,60})\s*$/im,
+        // "Position: Software Engineer"
+        /(?:position|role|job)[:\s]+([A-Za-z0-9\s\/+#.&()-]{3,60})(?:\n|$)/i,
     ];
 
     for (const pattern of patterns) {
@@ -284,12 +275,7 @@ function extractRole(subject = "", body = "") {
     return "Unknown Role";
 }
 
-function safeDate(date) {
-    const parsed = new Date(date);
-    return Number.isNaN(parsed.getTime())
-        ? new Date().toISOString()
-        : parsed.toISOString();
-}
+// ─── Main Export ──────────────────────────────────────────────────────────────
 
 export function classifyEmail(thread) {
     const {
@@ -302,22 +288,22 @@ export function classifyEmail(thread) {
         threadId,
     } = thread;
 
-    const statusResult = classifyStatus(subject, snippet, body);
+    const { status, confidence } = classifyStatus(subject, snippet, body);
     const company = extractCompany(from, subject, body, replyTo);
     const role = extractRole(subject, body);
 
     return {
         company,
         role,
-        status: statusResult.status,
+        status,
         email_subject: subject,
         email_snippet: snippet?.slice(0, 300),
         sender: from,
         thread_id: threadId,
-        applied_date: safeDate(date),
-
-        // Optional DB fields added below
-        parser_confidence: statusResult.confidence,
-        parser_reason: statusResult.reason,
+        applied_date: (() => {
+            const d = new Date(date);
+            return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+        })(),
+        parser_confidence: confidence,
     };
 }
