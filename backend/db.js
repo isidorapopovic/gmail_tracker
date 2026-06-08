@@ -58,9 +58,7 @@ export async function upsertJob(job) {
       email_snippet,
       sender,
       thread_id,
-      applied_date,
-      parser_confidence,
-      parser_reason
+      applied_date
     )
     VALUES (
       ${job.company},
@@ -70,30 +68,19 @@ export async function upsertJob(job) {
       ${job.email_snippet},
       ${job.sender},
       ${job.thread_id},
-      ${job.applied_date},
-      ${job.parser_confidence || 0},
-      ${job.parser_reason || null}
+      ${job.applied_date}
     )
-    ON CONFLICT (thread_id)
-    DO UPDATE SET
-      company = CASE
-        WHEN jobs.company = 'Unknown Company' AND EXCLUDED.company != 'Unknown Company'
-        THEN EXCLUDED.company
-        ELSE jobs.company
-      END,
-      role = CASE
-        WHEN (jobs.role IS NULL OR jobs.role = 'Unknown Role') AND EXCLUDED.role != 'Unknown Role'
-        THEN EXCLUDED.role
-        ELSE jobs.role
-      END,
+    ON CONFLICT (thread_id) DO UPDATE SET
+      company = COALESCE(NULLIF(EXCLUDED.company, 'Unknown Company'), jobs.company),
+      role = COALESCE(NULLIF(EXCLUDED.role, 'Unknown Role'), jobs.role),
       status = CASE
-        WHEN EXCLUDED.status != 'unknown'
-        THEN EXCLUDED.status
+        WHEN EXCLUDED.status != 'unknown' THEN EXCLUDED.status
         ELSE jobs.status
       END,
+      email_subject = EXCLUDED.email_subject,
       email_snippet = EXCLUDED.email_snippet,
-      parser_confidence = EXCLUDED.parser_confidence,
-      parser_reason = EXCLUDED.parser_reason,
+      sender = EXCLUDED.sender,
+      applied_date = COALESCE(EXCLUDED.applied_date, jobs.applied_date),
       last_updated = NOW()
     RETURNING *, (xmax = 0) AS inserted
   `;
@@ -102,7 +89,13 @@ export async function upsertJob(job) {
 }
 
 export async function getAllJobs() {
-    return await sql`SELECT * FROM jobs ORDER BY last_updated DESC`;
+    return await sql`
+    SELECT *
+    FROM jobs
+    ORDER BY
+      applied_date DESC NULLS LAST,
+      last_updated DESC
+  `;
 }
 
 export async function updateJobNotes(id, notes) {

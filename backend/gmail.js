@@ -154,19 +154,32 @@ export async function fetchJobEmails(accessToken) {
             const messages = thread.data.messages || [];
             if (messages.length === 0) continue;
 
-            const first = messages[0];
             const latest = messages[messages.length - 1];
 
-            const body = getEmailBody(latest);
+            const getHeader = (msg, name) =>
+                msg.payload?.headers?.find(
+                    (h) => h.name.toLowerCase() === name.toLowerCase()
+                )?.value || "";
+
+            const getMessageDate = (msg) => {
+                // Gmail internalDate is milliseconds since epoch and is more reliable
+                // for sorting than parsing the Date header.
+                if (msg.internalDate) {
+                    return new Date(Number(msg.internalDate)).toISOString();
+                }
+
+                const headerDate = getHeader(msg, "Date");
+                const parsed = new Date(headerDate);
+
+                return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+            };
 
             threads.push({
                 threadId,
                 subject: getHeader(latest, "Subject"),
                 from: getHeader(latest, "From"),
-                replyTo: getHeader(latest, "Reply-To"),
-                date: getHeader(first, "Date"),
+                date: getMessageDate(latest),
                 snippet: latest.snippet || "",
-                body: body.slice(0, 6000),
                 messageCount: messages.length,
             });
         } catch (err) {

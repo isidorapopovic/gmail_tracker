@@ -63,14 +63,22 @@ export default function Dashboard({ onLogout }) {
         onLogout();
     };
 
-    const filteredJobs = jobs.filter((j) => {
-        const matchesFilter = filter === "all" || j.status === filter;
-        const matchesSearch =
-            !search ||
-            j.company?.toLowerCase().includes(search.toLowerCase()) ||
-            j.role?.toLowerCase().includes(search.toLowerCase());
-        return matchesFilter && matchesSearch;
-    });
+    const filteredJobs = jobs
+        .filter((j) => {
+            const matchesFilter = filter === "all" || j.status === filter;
+            const matchesSearch =
+                !search ||
+                j.company?.toLowerCase().includes(search.toLowerCase()) ||
+                j.role?.toLowerCase().includes(search.toLowerCase());
+
+            return matchesFilter && matchesSearch;
+        })
+        .sort((a, b) => {
+            const dateA = new Date(a.applied_date || a.last_updated || 0).getTime();
+            const dateB = new Date(b.applied_date || b.last_updated || 0).getTime();
+
+            return dateB - dateA;
+        });
 
     return (
         <div style={s.root}>

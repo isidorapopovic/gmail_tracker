@@ -275,19 +275,35 @@ function extractRole(subject = "", body = "") {
     return "Unknown Role";
 }
 
+// ─── Date Handling ────────────────────────────────────────────────────────────
+
+function parseEmailDate(date) {
+    if (!date) return null;
+
+    // If gmail.js passes internalDate as a number/string timestamp in ms
+    if (/^\d+$/.test(String(date))) {
+        const fromMs = new Date(Number(date));
+        return Number.isNaN(fromMs.getTime()) ? null : fromMs.toISOString();
+    }
+
+    const parsed = new Date(date);
+    return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
+
 // ─── Main Export ──────────────────────────────────────────────────────────────
 
-export function classifyEmail(thread) {
+export function classifyEmail(thread = {}) {
     const {
         subject = "",
         from = "",
         replyTo = "",
         snippet = "",
         body = "",
-        date,
+        date = null,
         threadId,
     } = thread;
 
+    const parsedDate = parseEmailDate(date);
     const { status, confidence } = classifyStatus(subject, snippet, body);
     const company = extractCompany(from, subject, body, replyTo);
     const role = extractRole(subject, body);
@@ -297,13 +313,13 @@ export function classifyEmail(thread) {
         role,
         status,
         email_subject: subject,
-        email_snippet: snippet?.slice(0, 300),
+        email_snippet: snippet?.slice(0, 300) || body?.slice(0, 300) || "",
         sender: from,
         thread_id: threadId,
-        applied_date: (() => {
-            const d = new Date(date);
-            return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
-        })(),
+
+        // This is the field your DB/frontend should use for display and sorting.
+        applied_date: parsedDate,
+
         parser_confidence: confidence,
     };
 }

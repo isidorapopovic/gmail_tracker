@@ -10,6 +10,19 @@ const STATUS_OPTIONS = [
     "unknown",
 ];
 
+function formatDate(value) {
+    if (!value) return "—";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "—";
+
+    return new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    }).format(date);
+}
+
 export default function JobTable({ jobs, onChange }) {
     const [savingId, setSavingId] = useState(null);
 
@@ -87,9 +100,7 @@ export default function JobTable({ jobs, onChange }) {
                             </td>
 
                             <td style={s.td}>
-                                {job.email_date
-                                    ? new Date(job.email_date).toLocaleDateString()
-                                    : "—"}
+                                {formatDate(job.applied_date)}
                             </td>
 
                             <td style={s.td}>
