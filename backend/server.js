@@ -94,21 +94,33 @@ app.post("/sync", async (req, res) => {
 
         let added = 0;
         let updated = 0;
+        let ignored = 0;
 
         for (const thread of threads) {
             const classified = classifyEmail(thread);
+
+            if (!classified) {
+                ignored++;
+                continue;
+            }
+
             const result = await upsertJob(classified);
-            if (result?.inserted) added++;
-            else updated++;
+
+            if (result?.inserted) {
+                added++;
+            } else {
+                updated++;
+            }
         }
 
-        await logSync(threads.length, added, updated);
+        await logSync(threads.length, added, updated, ignored);
 
         res.json({
             ok: true,
             emailsFound: threads.length,
             jobsAdded: added,
             jobsUpdated: updated,
+            jobsIgnored: ignored,
         });
     } catch (err) {
         console.error("Sync error:", err);
